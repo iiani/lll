@@ -1,0 +1,338 @@
+#include<stdio.h>
+#include<windows.h>
+typedef struct dianti{
+	int zhuangtai;//三种状态：静止，上行，下行
+	int leixing;//三种类型：双，单，全
+	int ax1;//此时停在的楼层数
+	int bxy;//此楼层是否被调用
+	int flag;//是否有人用电梯
+}U;
+U q[4];
+int flag, dir, ax1, goax1;
+int c[3], k[3], m[3];
+int Xunzhao(int x, int y, int z){//计算楼层差值函数
+	int c;
+	if (q[x].zhuangtai == 0){//此时q[x]电梯处于静止状态
+		if (y < z){
+			c = z - y;
+		}else{
+			c = y - z;
+		}
+	}
+	if (q[x].zhuangtai == 1){//此时q[x]电梯处于上升状态
+		if (y > z && dir == 1){
+			c = y - z;
+		}else{
+			printf("此电梯不能响应");
+		}
+	}
+	if (q[x].zhuangtai == 2){//此时q[x]电梯处于下降状态
+		if (y < z && dir == 0){
+			c = z - y;
+		}else{
+			printf("此电梯不能响应");
+		}
+	}
+	return c;
+}
+void main(){
+	//接人操作
+	printf("目前电梯所在位置\n");
+	printf("\n");
+	printf("\n");
+	printf("    1        5          17        10     \n");
+	printf("\n");
+	printf("\n");
+	printf("------------------------------------------------------------\n");
+	q[0].zhuangtai = 0;
+	q[1].zhuangtai = 0;
+	q[2].zhuangtai = 0;
+	q[3].zhuangtai = 0;
+	q[0].ax1 =1;
+	q[1].ax1 = 5;//表示此时电梯停在的楼层数为7楼
+	q[2].ax1 = 17;
+	q[3].ax1 = 10;
+	while (1){
+		q[0].leixing = 2;//一号电梯所有楼层都停靠
+		q[1].leixing = 1;//二号电梯单号楼层都停靠
+		q[2].leixing = 0;//三号电梯双号楼层都停靠
+		q[3].leixing = 2;//四号电梯所有楼层都停靠
+		int i;
+		int flag1 = 0, j = 0;
+		printf("-----------------------------------------------------------------------\n");
+		printf("使用电梯请按1 \n");
+		scanf("%d", &flag);//此时是否有人按电梯
+		if (flag == 1){
+			printf("----------------电梯开始运转--------------------\n");
+		}
+		printf("你所在楼层为: ");
+		scanf("%d", &ax1);//此时按电梯的人所在的楼层数
+		printf("上楼按 1 ，下楼按 0: ");
+		scanf("%d", &dir);//用户请求是上楼还是下楼标记
+		printf("你要去的楼层是: ");
+		scanf("%d", &goax1);//用户要去的楼层
+		if (flag == 1){//用户按电梯
+			if (dir == 1){//用户要上楼
+			if (ax1 % 2 == 0){//用户所在为偶数楼层
+			if (goax1 % 2 == 1){//用户要去奇数楼层
+			for (i = 0; i < 4; i++){
+			if (q[i].leixing == 2){
+			q[i].bxy = 1;
+			}else{
+			q[i].bxy = 0;
+				}
+			while (q[i].bxy == 1){
+				k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+				m[flag1] = i;
+				flag1++;
+					q[i].bxy = 0;
+					}
+					}
+					if (k[0] < k[1]){
+					printf("此时效率最高的电梯为：0\n");
+					q[0].ax1 = goax1;
+					q[0].zhuangtai = 0;
+					}else{
+					printf("此时效率最高的电梯为：3\n");
+					q[3].ax1 = goax1;
+					q[3].zhuangtai = 0;
+					}
+				}
+		if (goax1 % 2 == 0){//用户要去偶数楼层
+				for (i = 0; i < 4; i++){
+						if (q[i].leixing == 2 || q[i].leixing == 0){
+							q[i].bxy = 1;
+						}else{
+							q[i].bxy = 0;
+					}
+				while (q[i].bxy == 1){
+							k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+							m[flag1] = i;
+						flag1++;
+						q[i].bxy = 0;
+						}
+					}
+				if (k[0] < k[1]){
+			if (k[0] < k[2]){
+							printf("此时效率最高的电梯为：0\n");
+							q[0].ax1 = goax1;
+							q[0].zhuangtai = 0;
+						}else{
+							printf("此时效率最高的电梯为：3\n");
+							q[3].ax1 = goax1;
+						q[3].zhuangtai = 0;
+						}
+					}else{
+						if (k[1] < k[2]){
+							printf("此时效率最高的电梯为：2\n");
+						q[2].ax1 = goax1;
+							q[2].zhuangtai = 0;
+						}else{
+							printf("此时效率最高的电梯为：3\n");
+							q[3].ax1 = goax1;
+							q[3].zhuangtai = 0;
+					}
+				}
+			}
+		}
+		if (ax1 % 2 == 1){//用户所在为奇数楼层
+			if (goax1 % 2 == 0){//用户要去偶数楼层
+				for (i = 0; i < 4; i++){
+					if (q[i].leixing == 2){	
+		q[i].bxy = 1;
+				}else{
+						q[i].bxy = 0;
+					}
+					while (q[i].bxy == 1){
+						k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+						m[flag1] = i;
+						flag1++;
+							q[i].bxy = 0;
+					}
+					}
+				if (k[0] < k[1]){
+			printf("此时效率最高的电梯为：0\n");
+					q[0].ax1 = goax1;
+					q[0].zhuangtai = 0;
+			}else{
+				printf("此时效率最高的电梯为：3\n");
+		q[3].ax1 = goax1;
+						q[3].zhuangtai = 0;
+					}
+				}
+				if (goax1 % 2 == 1){//用户要去奇数楼层
+					for (i = 0; i < 4; i++){
+							if (q[i].leixing == 2 || q[i].leixing == 1){
+							q[i].bxy = 1;
+						}else{
+							q[i].bxy = 0;
+						}
+						while (q[i].bxy == 1){
+							k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+							m[flag1] = i;
+							flag1++;
+							q[i].bxy = 0;
+						}
+				}
+			if (k[0] < k[1]){
+							if (k[0] < k[2]){
+						printf("此时效率最高的电梯为：0\n");
+							q[0].ax1 = goax1;
+						q[0].zhuangtai = 0;
+					}else{
+					printf("此时效率最高的电梯为：3\n");
+						q[3].ax1 = goax1;
+			q[3].zhuangtai = 0;
+							}
+						}else{
+			if (k[1] < k[2]){
+					printf("此时效率最高的电梯为：2\n");
+								q[1].ax1 = goax1;
+q[1].zhuangtai = 0;
+							}else{
+						printf("此时效率最高的电梯为：3\n");
+								q[3].ax1 = goax1;
+								q[3].zhuangtai = 0;
+						}
+					}
+					}
+			}
+			}
+			if (dir == 0){//用户要下楼
+		if (ax1 % 2 == 0){//用户所在为偶数楼层
+				if (goax1 % 2 == 1){//用户要去奇数楼层
+						for (i = 0; i < 4; i++){
+					if (q[i].leixing == 2){
+								q[i].bxy = 1;
+							}else{
+								q[i].bxy = 0;
+					}
+							while (q[i].bxy == 1){
+								k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+						m[flag1] = i;
+						flag1++;
+								q[i].bxy = 0;
+							}
+						}
+			if (k[0] < k[1]){
+							printf("此时效率最高的电梯为：0\n");
+				q[0].ax1 = goax1;
+							q[0].zhuangtai = 0;
+						}else{
+				printf("此时效率最高的电梯为：3\n");
+							q[3].ax1 = goax1;
+							q[3].zhuangtai = 0;
+				}
+					}
+					if (goax1 % 2 == 0){//用户要去偶数楼层
+						for (i = 0; i < 4; i++){
+				if (q[i].leixing == 2 || q[i].leixing == 0){
+								q[i].bxy = 1;
+					}else{
+								q[i].bxy = 0;
+					}
+							while (q[i].bxy == 1){
+						k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+						m[flag1] = i;
+					flag1++;
+								q[i].bxy = 0;
+					}
+						}
+						if (k[0] < k[1]){
+					if (k[0] < k[2]){
+								printf("此时效率最高的电梯为：0\n");
+								q[0].ax1 = goax1;
+					q[0].zhuangtai = 0;
+							}else{
+						printf("此时效率最高的电梯为：3\n");
+								q[3].ax1 = goax1;
+						q[3].zhuangtai = 0;
+							}
+			}else{
+							if (k[1] < k[2]){
+								printf("此时效率最高的电梯为：2\n");
+								q[2].ax1 = goax1;
+								q[2].zhuangtai = 0;
+							}else{
+printf("此时效率最高的电梯为：3\n");
+								q[3].ax1 = goax1;
+								q[3].zhuangtai = 0;
+						}
+						}
+					}
+				}
+				if (ax1 % 2 == 1){//用户所在为奇数楼层
+				if (goax1 % 2 == 0){//用户要去偶数楼层
+						for (i = 0; i < 4; i++){
+						if (q[i].leixing == 2){
+								q[i].bxy = 1;
+							}else{
+								q[i].bxy = 0;
+							}
+						while (q[i].bxy == 1){
+								k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+								m[flag1] = i;
+								flag1++;
+							q[i].bxy = 0;
+							}
+					}
+						if (k[0] < k[1]){
+						printf("此时效率最高的电梯为：0\n");
+							q[0].ax1 = goax1;
+						q[0].zhuangtai = 0;
+					}else{
+							printf("此时效率最高的电梯为：3\n");
+							q[3].ax1 = goax1;
+						q[3].zhuangtai = 0;
+						}
+					}
+					if (goax1 % 2 == 1){//用户要去奇数楼层
+					for (i = 0; i < 4; i++){
+							if (q[i].leixing == 2 || q[i].leixing == 1){
+								q[i].bxy = 1;
+							}else{
+							q[i].bxy = 0;
+							}
+							while (q[i].bxy == 1){
+						k[flag1] = Xunzhao(i, ax1, q[i].ax1);
+								m[flag1] = i;
+						flag1++;
+								q[i].bxy = 0;
+				}
+					}
+						if (k[0] < k[1]){
+							if (k[0] < k[2]){
+						printf("此时效率最高的电梯为：0\n");
+								q[0].ax1 = goax1;
+							q[0].zhuangtai = 0;
+						}else{
+							printf("此时效率最高的电梯为：3\n");
+					q[3].ax1 = goax1;
+						q[3].zhuangtai = 0;
+							}
+						}else{
+							if (k[1] < k[2]){
+						printf("此时效率最高的电梯为：2\n");
+								q[1].ax1 = goax1;
+						q[1].zhuangtai = 0;
+							}else{
+								printf("此时效率最高的电梯为：3\n");
+						q[3].ax1 = goax1;
+								q[3].zhuangtai = 0;
+					}
+						}
+			}
+				}
+			}
+		}else if (flag == 0){
+			printf("此时无人用电梯");
+		}
+		printf("您已经成功到达\n");
+		printf("目前电梯所在位置\n");
+		printf("\n");
+		printf("     %2d        %2d          %2d         %2d     \n", q[0].ax1, q[1].ax1, q[2].ax1, q[3].ax1);
+		printf("\n");
+		printf("\n");
+		printf("\n");
+	}
+}
